@@ -9,13 +9,13 @@ using mm2020, CSVFiles, DataFrames
 #   Difference in the variance of turnovers in the game to game free throw percentage.
 
 # Get the submission sample
-submission_sample = CSVFiles.load("/home/swojcik/github/mm2020.jl/data/MSampleSubmissionStage1_2020.csv") |> DataFrame
+submission_sample = CSVFiles.load("/home/swojcik/mm2020/data/MSampleSubmissionStage1_2020.csv") |> DataFrame
 
 # Get the source seeds:
-df_seeds = CSVFiles.load("/home/swojcik/github/mm2020.jl/data/MDataFiles_Stage1/MNCAATourneySeeds.csv") |> DataFrame
-season_df = CSVFiles.load("/home/swojcik/github/mm2020.jl/data/MDataFiles_Stage1/MRegularSeasonCompactResults.csv") |> DataFrame
-season_df_detail = CSVFiles.load("/home/swojcik/github/mm2020.jl/data/MDataFiles_Stage1/MRegularSeasonDetailedResults.csv") |> DataFrame
-tourney_df  = CSVFiles.load("/home/swojcik/github/mm2020.jl/data/MDataFiles_Stage1/MNCAATourneyCompactResults.csv") |> DataFrame
+df_seeds = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MNCAATourneySeeds.csv") |> DataFrame
+season_df = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MRegularSeasonCompactResults.csv") |> DataFrame
+season_df_detail = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MRegularSeasonDetailedResults.csv") |> DataFrame
+tourney_df  = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MNCAATourneyCompactResults.csv") |> DataFrame
 ##############################################################
 # Create training features for valid historical data
 # SEEDS
@@ -110,7 +110,7 @@ accuracy(predict_mode(tuned_ensemble, rows=test), y[test])
 
 params, measures = report(tuned_ensemble).plotting.parameter_values, report(tuned_ensemble).plotting.measurements
 plot(params[:, 1], measures, seriestype=:scatter)
-                
+
 xg_model = machine(xgb_forest, fullX_co, y)
 fit!(xg_model, rows = train)
 yhat = predict(xg_model, rows=test)

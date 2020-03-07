@@ -97,7 +97,7 @@ end
 
 function get_eff_tourney_diffs(Wfdat, Lfdat, fdat, df_tour)
 	# NEED TO MAKE THIS COMPATIBLE WITH THE REST OF THE DATA: TAKE DIFFS AND CONCATENATE
-	df_tour = load("/home/swojcik/github/mm2020.jl/data/MDataFiles_Stage1/MNCAATourneyCompactResults.csv") |> DataFrame
+	df_tour = load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MNCAATourneyCompactResults.csv") |> DataFrame
 
 	deletecols!(df_tour, [ :WScore, :LScore, :WLoc, :NumOT])
 	df = join(df_tour, Wfdat, on = [:Season, :WTeamID], kind = :left)
