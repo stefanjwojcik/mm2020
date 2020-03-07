@@ -116,12 +116,12 @@ function get_eff_tourney_diffs(Wfdat, Lfdat, fdat, df_tour)
 	df_concat.Season = df.Season
 
 	df_wins = copy(df_concat)
-	df_wins.Result .= 1
+	df_wins[:, :Result] .= 1
 
 	df_losses = copy(df_concat[:, [:Season, :WTeamID, :LTeamID]])
 	newcols = mapcols(x -> x*-1, copy(select(df_concat, pred_vars)))
 	df_losses = hcat(df_losses, newcols, copycols=false)
-	df_losses.Result .= 0
+	df_losses[:, :Result] .= 0
 
 	df_out = [df_wins; df_losses]
 	return dropmissing(df_out)

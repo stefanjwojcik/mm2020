@@ -37,12 +37,14 @@ seeds_features_min = filter(row -> row[:Season] >= 2003, seeds_features)
 eff_features_min = filter(row -> row[:Season] >= 2003, eff_features)
 elo_features_min = filter(row -> row[:Season] >= 2003, elo_features)
 momentum_features_min = filter(row -> row[:Season] >= 2003, momentum_features)
+ranef_features_min = filter(row -> row[:Season] >= 2003, ranef_features)
 
 # create full stub
 
 stub = join(seeds_features_min, eff_features_min, on = [:WTeamID, :LTeamID, :Season, :Result], kind = :left);
 fdata = join(stub, elo_features, on = [:WTeamID, :LTeamID, :Season, :Result], kind = :left);
 fdata = join(fdata, momentum_features_min, on = [:WTeamID, :LTeamID, :Season, :Result], kind = :left);
+fdata = join(fdata, ranef_features_min, on = [:WTeamID, :LTeamID, :Season, :Result], kind = :left);
 
 exclude = [:Result, :Season, :LTeamID, :WTeamID]
 deletecols!(fdata, exclude)

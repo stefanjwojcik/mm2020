@@ -28,7 +28,7 @@ export  make_seeds,
         make_momentum,
         make_momentum_sub,
         make_ranef_features,
-        ranef_sub
+        make_ranef_sub
 
 
 ##############################################################################

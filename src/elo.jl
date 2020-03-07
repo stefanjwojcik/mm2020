@@ -70,8 +70,8 @@ end
 function iterate_games(elo_obj::Elo)
 
 	# update the basic info
-	elo_obj.data_path = "/home/swojcik/github/mm2020.jl/data/MDataFiles_Stage1/MRegularSeasonCompactResults.csv"
-	elo_obj.rs = load(elo_obj.data_path) |> DataFrame
+	elo_obj.data_path = "/home/swojcik/mm2020/data/MDataFiles_Stage1/MRegularSeasonCompactResults.csv"
+	elo_obj.rs = CSVFiles.load(elo_obj.data_path) |> DataFrame
 	elo_obj.rs.margin = elo_obj.rs.WScore - elo_obj.rs.LScore
 	elo_obj.HOME_ADVANTAGE = 100.0
 	elo_obj.team_ids = unique([ elo_obj.rs.WTeamID ; elo_obj.rs.LTeamID ]) #all team ids

@@ -12,8 +12,8 @@ function make_seeds(df_seeds, df_tour)
 
 	df_seeds.seed_int = seed_to_int.(df_seeds.Seed)
 
-	deletecols!(df_seeds, :Seed)
-	deletecols!(df_tour, [:DayNum, :WScore, :LScore, :WLoc, :NumOT])
+	select!(df_seeds, Not(:Seed))
+	select!(df_tour, Not([:DayNum, :WScore, :LScore, :WLoc, :NumOT]))
 
 	print("creating seeds...")
 
@@ -27,10 +27,10 @@ function make_seeds(df_seeds, df_tour)
 	df_concat = join(df_dummy, df_lossseeds, on = [:Season, :LTeamID])
 	df_concat.SeedDiff = df_concat.WSeed - df_concat.LSeed
 
-	df_wins = copy(df_concat[[:Season, :WTeamID, :LTeamID, :SeedDiff]])
+	df_wins = copy(df_concat[:, [:Season, :WTeamID, :LTeamID, :SeedDiff]])
 	df_wins.Result = 1
 
-	df_losses = copy(df_concat[[:Season, :WTeamID, :LTeamID]])
+	df_losses = copy(df_concat[:, [:Season, :WTeamID, :LTeamID]])
 	df_losses.SeedDiff = df_concat.SeedDiff*-1
 	df_losses.Result = 0
 
