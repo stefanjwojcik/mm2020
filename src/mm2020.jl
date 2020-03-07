@@ -26,7 +26,9 @@ export  make_seeds,
         get_elo_tourney_diffs,
         get_elo_submission_diffs,
         make_momentum,
-        make_momentum_sub
+        make_momentum_sub,
+        make_ranef_features,
+        ranef_sub
 
 
 ##############################################################################
@@ -39,5 +41,6 @@ include("efficiency.jl")
 include("seeds.jl")
 include("elo.jl")
 include("momentum.jl")
+include("teameffects.jl")
 
 end # module

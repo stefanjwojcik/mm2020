@@ -16,6 +16,7 @@ df_seeds = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MNCAATourn
 season_df = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MRegularSeasonCompactResults.csv") |> DataFrame
 season_df_detail = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MRegularSeasonDetailedResults.csv") |> DataFrame
 tourney_df  = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MNCAATourneyCompactResults.csv") |> DataFrame
+ranefs = CSVFiles.load("raneffects.csv") |> DataFrame
 ##############################################################
 # Create training features for valid historical data
 # SEEDS
@@ -28,6 +29,9 @@ season_elos = elo_ranks(Elo())
 elo_features = get_elo_tourney_diffs(season_elos, copy(tourney_df))
 # Momentum
 momentum_features, momentum_df = make_momentum(copy(tourney_df), copy(season_df))
+# Team Effects
+ranef_features = make_ranef_features(copy(tourney_df), ranefs)
+
 ### Full feature dataset
 seeds_features_min = filter(row -> row[:Season] >= 2003, seeds_features)
 eff_features_min = filter(row -> row[:Season] >= 2003, eff_features)
@@ -48,17 +52,18 @@ seed_submission = get_seed_submission_diffs(copy(submission_sample), df_seeds)
 eff_submission = get_eff_submission_diffs(copy(submission_sample), effdat) #see above
 elo_submission = get_elo_submission_diffs(copy(submission_sample), season_elos)
 momentum_submission = make_momentum_sub(copy(submission_sample), momentum_df)
+ranef_submission = make_ranef_sub(copy(submission_sample), ranefs)
 @test size(seed_submission, 1) == size(eff_submission, 1) == size(elo_submission, 1) == size(momentum_submission, 1)
 
 # Create full submission dataset
-submission_features = hcat(seed_submission, eff_submission, elo_submission, momentum_submission)
+submission_features = hcat(seed_submission, eff_submission, elo_submission, momentum_submission, ranef_submission)
 
 ##########################################################################
 
 # TRAINING
 
 # Join the two feature sets
-featurecols = [names(seed_submission), names(eff_submission), names(elo_submission), names(momentum_submission)]
+featurecols = [names(seed_submission), names(eff_submission), names(elo_submission), names(momentum_submission), names(ranef_submission)]
 featurecols = collect(Iterators.flatten(featurecols))
 fullX = [fdata[featurecols]; submission_features[featurecols]]
 fullY = [seeds_features_min.Result; repeat([0], size(submission_features, 1))]

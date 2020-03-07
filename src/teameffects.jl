@@ -34,32 +34,33 @@ function make_team_effects(season_df)
 end
 
 function make_ranef_features(tourney_df, ranefs)
-	tourney_df.ranef = 0.0
-	wins  = rename(copy(ranefs), :TeamID => :WTeamID)
-	losses  = rename(copy(ranefs), :TeamID => :LTeamID)
+	#tourney_df.ranef = 0.0
+	wins  = rename(copy(ranefs), :TeamID => :WTeamID, :ranef => :wranefs)
+	losses  = rename(copy(ranefs), :TeamID => :LTeamID, :ranef => :lranefs)
 	stub = join(tourney_df, wins, on = [:WTeamID, :Season], kind = :left)
 	full = join(stub, losses, on = [:LTeamID, :Season], kind = :left)
-	for row in eachrow(tourney_df)
-		season, team1, team2 = parse.(Int, split(row.ID, "_"))
-		row1 = filter(row -> row[:Season] == season && row[:TeamID] == team1, momentum_df);
-		size(row1)[1]==0 && continue
-		row2 = filter(row -> row[:Season] == season && row[:TeamID] == team2, momentum_df);
-		size(row2)[1]==0 && continue
-		submission_sample.ScoreDiff[getfield(row, :row)] = (row1.ScoreDiff - row2.ScoreDiff)[1]
-	end
-	return submission_sample[:, [:ScoreDiff]]
+	full.RanefDiff = full.wranefs - full.lranefs
+
+	df_wins = copy(full[[:Season, :WTeamID, :LTeamID, :RanefDiff]])
+	df_wins.Result = 1
+
+	df_losses = copy(full[[:Season, :WTeamID, :LTeamID]])
+	df_losses.RanefDiff = full.RanefDiff*-1
+	df_losses.Result = 0
+
+	println("done")
+	df_predictions = [df_wins; df_losses]
 end
 
 
-function ranef_sub(submission_sample, ranefs)
-	submission_sample.ranef = 0.0
+function make_ranef_sub(submission_sample, ranefs)
+	submission_sample.RanefDiff = -99
 	for row in eachrow(submission_sample)
 		season, team1, team2 = parse.(Int, split(row.ID, "_"))
-		row1 = filter(row -> row[:Season] == season && row[:TeamID] == team1, momentum_df);
-		size(row1)[1]==0 && continue
-		row2 = filter(row -> row[:Season] == season && row[:TeamID] == team2, momentum_df);
-		size(row2)[1]==0 && continue
-		submission_sample.ScoreDiff[getfield(row, :row)] = (row1.ScoreDiff - row2.ScoreDiff)[1]
+		# get seeds for team1 and team
+		row1 = filter(row -> row[:Season] == season && row[:TeamID] == team1, ranefs);
+		row2 = filter(row -> row[:Season] == season && row[:TeamID] == team2, ranefs);
+		submission_sample.RanefDiff[getfield(row, :row)] = (row1.ranef - row2.ranef)[1]
 	end
-	return submission_sample[:, [:ScoreDiff]]
+	return submission_sample[:, [:RanefDiff]]
 end
