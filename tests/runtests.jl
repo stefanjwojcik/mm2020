@@ -9,14 +9,14 @@ using mm2020, CSVFiles, DataFrames
 #   Difference in the variance of turnovers in the game to game free throw percentage.
 
 # Get the submission sample
-submission_sample = CSVFiles.load("/home/swojcik/mm2020/data/MSampleSubmissionStage1_2020.csv") |> DataFrame
+submission_sample = CSVFiles.load("data/MSampleSubmissionStage1_2020.csv") |> DataFrame
 
 # Get the source seeds:
-df_seeds = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MNCAATourneySeeds.csv") |> DataFrame
-season_df = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MRegularSeasonCompactResults.csv") |> DataFrame
-season_df_detail = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MRegularSeasonDetailedResults.csv") |> DataFrame
-tourney_df  = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MNCAATourneyCompactResults.csv") |> DataFrame
-ranefs = CSVFiles.load("raneffects.csv") |> DataFrame
+df_seeds = CSVFiles.load("data/MDataFiles_Stage1/MNCAATourneySeeds.csv") |> DataFrame
+season_df = CSVFiles.load("data/MDataFiles_Stage1/MRegularSeasonCompactResults.csv") |> DataFrame
+season_df_detail = CSVFiles.load("data/MDataFiles_Stage1/MRegularSeasonDetailedResults.csv") |> DataFrame
+tourney_df  = CSVFiles.load("data/MDataFiles_Stage1/MNCAATourneyCompactResults.csv") |> DataFrame
+ranefs = CSVFiles.load("data/raneffects.csv") |> DataFrame
 ##############################################################
 # Create training features for valid historical data
 # SEEDS
@@ -76,8 +76,8 @@ using DataFrames, CSVFiles, Pipe, MLJ, LossFunctions
 #save("fullX.csv", fullX)
 #save("fullY.csv", DataFrame(y=fullY))
 
-fullX = CSVFiles.load("data/fullX.csv") |> DataFrame
-fullY = CSVFiles.load("data/fullY.csv") |> DataFrame
+fullX = CSVFiles.load("fullX.csv") |> DataFrame
+fullY = CSVFiles.load("fullY.csv") |> DataFrame
 
 # create array of training and testing rows
 train, test = partition(1:2230, 0.7, shuffle=true)
@@ -92,8 +92,8 @@ y = @pipe categorical(fullY.y) |> recode(_, 0=>"lose",1=>"win");
 xgb = XGBoostClassifier()
 fullX_co = coerce(fullX, Count=>Continuous)
 #--- Setting the rounds of the xgb, then tuning depth and children
-xgb.num_round = 6
-xgb.max_depth = 3
+xgb.num_round = 4
+xgb.max_depth = 4
 xgb.min_child_weight = 4.2105263157894735
 xgb.gamma = 11
 xgb.eta = .35
@@ -118,6 +118,8 @@ accuracy(predict_mode(tuned_ensemble, rows=test), y[test])
 params, measures = report(tuned_ensemble).plotting.parameter_values, report(tuned_ensemble).plotting.measurements
 plot(params[:, 1], measures, seriestype=:scatter)
 
+xgb_forest = EnsembleModel(atom=xgb, n=1000);
+#xgb_forest.bagging_fraction = .8
 xg_model = machine(xgb_forest, fullX_co, y)
 fit!(xg_model, rows = train)
 yhat = predict(xg_model, rows=test)
@@ -126,10 +128,25 @@ accuracy(predict_mode(xg_model, rows=test), y[test])
 ####################################################
 # Predict onto the submission_sample
 sub_sample = predict(xg_model, rows = validate)
-submission_sample.Pred = pdf.(sub_sample, "win")
-save("data/submission_xgb.csv", submission_sample)
-####################################################
+submission_sample[:Pred] = pdf.(sub_sample, "win")
+save("submission_xgb.csv", submission_sample)
+############################### TUNING THE SUBMISSION
+using LossFunctions
+loss = LogitDistLoss()
+
+logloss(yhat, y) = -1/length(y) * sum(y .* log.(yhat.+1e-15) .+ (1 .- y) .* log.(1 .- yhat .+1e-15) )
+threshold = [.95, .92, .90, .88, .85, .80, .75, .70, .65]
+mce_out = []
+ytest = Float32(1.0) .* (y[test] .== "win")
+for thresh in threshold
+        recode_pred = Float64[ifelse(x >= thresh, 1.0, x) for x in pdf.(yhat, "win")]
+        recode_pred = [ifelse(x <= (1.0-thresh), 0.0, x) for x in recode_pred]
+        push!(mce_out, loss(ytest, recode_pred) |> sum)
+end
+
+###########################
 # measuring the number of rounds
+xgbm = machine(xgb, fullX_co, y)
 r = range(xgb, :num_round, lower=1, upper=50)
 curve = learning_curve!(xgbm, resampling=CV(nfolds=3),
                         range=r, resolution=20,
