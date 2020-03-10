@@ -93,13 +93,20 @@ xgb = XGBoostClassifier()
 fullX_co = coerce(fullX, Count=>Continuous)
 #--- Setting the rounds of the xgb, then tuning depth and children
 xgb.num_round = 4
-xgb.max_depth = 4
+xgb.max_depth = 3
 xgb.min_child_weight = 4.2105263157894735
 xgb.gamma = 11
 xgb.eta = .35
 xgb.subsample = 0.6142857142857143
 xgb.colsample_bytree = 1.0
 
+xgb_forest = EnsembleModel(atom=xgb, n=1000);
+#xgb_forest.bagging_fraction = .8
+xg_model = machine(xgb_forest, fullX_co, y)
+fit!(xg_model, rows = train)
+yhat = predict(xg_model, rows=test)
+mce = cross_entropy(yhat, y[test]) |> mean
+accuracy(predict_mode(xg_model, rows=test), y[test])
 # This is a working single model for XGBOOST Classifier
 xgb_forest = EnsembleModel(atom=xgb, n=100);
 xgb_forest.bagging_fraction = .72
@@ -118,13 +125,7 @@ accuracy(predict_mode(tuned_ensemble, rows=test), y[test])
 params, measures = report(tuned_ensemble).plotting.parameter_values, report(tuned_ensemble).plotting.measurements
 plot(params[:, 1], measures, seriestype=:scatter)
 
-xgb_forest = EnsembleModel(atom=xgb, n=1000);
-#xgb_forest.bagging_fraction = .8
-xg_model = machine(xgb_forest, fullX_co, y)
-fit!(xg_model, rows = train)
-yhat = predict(xg_model, rows=test)
-mce = cross_entropy(yhat, y[test]) |> mean
-accuracy(predict_mode(xg_model, rows=test), y[test])
+
 ####################################################
 # Predict onto the submission_sample
 sub_sample = predict(xg_model, rows = validate)
