@@ -4,7 +4,7 @@ This repository generates features and a baseline model for the Men's 2020 NCAA 
 
 This script creates features and a ML modeling for predicting the outcome of the Men's NCAA March Madness Tournament.
 
-First, load some dependencies. The primary machine learning methods are done using the [MLJ] (https://github.com/alan-turing-institute/MLJ.jl)
+First, load some dependencies. The primary machine learning methods are done using the [MLJ](https://github.com/alan-turing-institute/MLJ.jl)
 
 ```julia
  using MLJ, Test, Pipe
@@ -174,4 +174,4 @@ mce = cross_entropy(yhat, y[train]) |> mean
 accuracy(predict_mode(xg_model, rows=test), y[test])
 ```
 
-Woot! Not bad! There you go, a machine learning model with Julia. Not that hard. And there are so many ways you can optimize julia to be even faster. There is a great book by [Avik Sengupta](https://www.amazon.com/Julia-High-performance-Avik-Sengupta/dp/1785880918#ace-g0160871354) detailing how to do this. 
+Woot! Not bad! There you go, a machine learning model with Julia. Not that hard. And there are so many ways you can optimize julia to be even faster. There is a great book by [Avik Sengupta](https://www.amazon.com/Julia-High-performance-Avik-Sengupta/dp/1785880918#ace-g0160871354) detailing how to do this.
