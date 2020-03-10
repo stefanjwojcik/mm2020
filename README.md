@@ -2,9 +2,9 @@
 
 This repository generates features and a baseline model for the Men's 2020 NCAA [Kaggle](https://www.kaggle.com/c/google-cloud-ncaa-march-madness-2020-division-1-mens-tournament) prediction competition.
 
-This script creates features and a ML modeling for predicting the outcome of the Men's NCAA March Madness Tournament.
+This script creates features and a ML modeling for predicting the outcome of the Men's NCAA March Madness Tournament. You will need to load the data from Kaggle, find that [here](https://www.kaggle.com/c/march-madness-analytics-2020).
 
-First, load some dependencies. The primary machine learning methods are done using the [MLJ](https://github.com/alan-turing-institute/MLJ.jl)
+First, load some dependencies. The primary machine learning methods are done using the [MLJ](https://github.com/alan-turing-institute/MLJ.jl).
 
 ```julia
  using MLJ, Test, Pipe
@@ -26,7 +26,7 @@ Load all the source data required to generate basic features: the seeds, the com
  tourney_df  = CSVFiles.load("data/MDataFiles_Stage1/MNCAATourneyCompactResults.csv") |> DataFrame
 ```
 
-Finally, due to some compatibility issues with MixedModels.jl, load team effects, which had to be generated and saved in a separate environment. I'll describe how these were created a bit later.
+Finally, due to some compatibility issues with MixedModels.jl, load team effects, which had to be generated and saved in a separate environment. I'll describe how these were created a bit later, but you can recreate them yourself with the code [teameffects.jl](https://github.com/stefanjwojcik/mm2020/blob/master/src/teameffects.jl).
 
  ```julia
  ranefs = CSVFiles.load("data/raneffects.csv") |> DataFrame
