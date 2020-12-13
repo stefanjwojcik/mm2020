@@ -1,4 +1,4 @@
-using MLJ, Test, Pipe
+using MLJ, Test
 using mm2020, CSVFiles, DataFrames
 
 # Notes:

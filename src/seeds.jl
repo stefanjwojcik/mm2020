@@ -28,11 +28,11 @@ function make_seeds(df_seeds, df_tour)
 	df_concat.SeedDiff = df_concat.WSeed - df_concat.LSeed
 
 	df_wins = copy(df_concat[:, [:Season, :WTeamID, :LTeamID, :SeedDiff]])
-	df_wins.Result = 1
+	df_wins.Result = repeat([1], nrow(df_wins))
 
 	df_losses = copy(df_concat[:, [:Season, :WTeamID, :LTeamID]])
 	df_losses.SeedDiff = df_concat.SeedDiff*-1
-	df_losses.Result = 0
+	df_losses.Result = repeat([0], nrow(df_wins))
 
 	println("done")
 	df_predictions = [df_wins; df_losses]
@@ -42,7 +42,7 @@ end
 # returns the correct seed features for the submission sample
 function get_seed_submission_diffs(submission_sample, seeds_df)
 	#seed to int
-	submission_sample.SeedDiff = -99
+	submission_sample.SeedDiff = repeat([-99], nrow(submission_sample))
 	seeds_df.seed_int = seed_to_int.(seeds_df.Seed)
 	for row in eachrow(submission_sample)
 		season, team1, team2 = parse.(Int, split(row.ID, "_"))

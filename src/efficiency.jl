@@ -2,10 +2,10 @@
 
 ## FROM : https://www.kaggle.com/lnatml/feature-engineering-with-advanced-stats
 """
-eff_stats()
-This file is responsible for creating 'advanced' features related to team efficiencies
-"""
+eff_stat_seasonal_means(df)
 
+Returns a tuple of team efficiencies aggregated by season for the winning team, losing team, and one with plain team IDS.
+"""
 function eff_stat_seasonal_means(df) # this is season_df_detail
 	#Points Winning/Losing Team
 	df.WPts = 2*df.WFGM + df.WFGM3 + df.WFTM
@@ -95,6 +95,11 @@ function eff_stat_seasonal_means(df) # this is season_df_detail
 	return Wfdat, Lfdat, fdat_mean
 end
 
+"""
+get_eff_tourney_diffs(Wfdat, Lfdat, fdat, df_tour)
+
+Returns team seasonal efficiency differences in tournament-friendly format
+"""
 function get_eff_tourney_diffs(Wfdat, Lfdat, fdat, df_tour)
 	# NEED TO MAKE THIS COMPATIBLE WITH THE REST OF THE DATA: TAKE DIFFS AND CONCATENATE
 	df_tour = CSVFiles.load("/home/swojcik/mm2020/data/MDataFiles_Stage1/MNCAATourneyCompactResults.csv") |> DataFrame
@@ -131,6 +136,11 @@ end
 #dropmissing!(eff_stats())
 ################# JULIA ############
 
+"""
+get_eff_submission_diffs(submission_sample, fdat)
+
+Returns seasonal efficiency score differences matched to a submission sample 
+"""
 function get_eff_submission_diffs(submission_sample, fdat)
 	final_out = DataFrame()
 	# The variables to take diffs

@@ -1,0 +1,3 @@
+var documenterSearchIndex = {"docs":
+[{"location":"#March-Madness-2020-Men's-Forecast-1","page":"March Madness 2020 Men's Forecast","title":"March Madness 2020 Men's Forecast","text":"","category":"section"},{"location":"#","page":"March Madness 2020 Men's Forecast","title":"March Madness 2020 Men's Forecast","text":"This repository generates features and a baseline model for the Men's 2020 NCAA Kaggle prediction competition.","category":"page"},{"location":"#","page":"March Madness 2020 Men's Forecast","title":"March Madness 2020 Men's Forecast","text":"This script creates features and a ML modeling for predicting the outcome of the Men's NCAA March Madness Tournament. You will need to load the data from Kaggle, find that here.","category":"page"}]
+}
